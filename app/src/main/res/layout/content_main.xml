@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_main"
+    tools:context="org.thewdj.blueserial.MainActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/type_layout"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:text="Work type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/type_tag" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/receive_layout"
+            android:layout_alignParentStart="true"
+            android:id="@+id/type_group">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="String"
+                android:id="@+id/type_string"
+                android:enabled="true"
+                android:checked="true" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hex"
+                android:id="@+id/type_hex" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/type_layout"
+        android:layout_alignParentStart="true"
+        android:id="@+id/transmit_layout">
+
+        <TextView
+            android:text="Transmit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/transmit_tag" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:id="@+id/transmit_input"
+            android:layout_below="@+id/transmit_tag"
+            android:layout_alignParentStart="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:inputType="textNoSuggestions|text"
+            android:enabled="true"
+            android:textAlignment="center"
+            android:typeface="monospace" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Send"
+            android:id="@+id/button_transmit_send"
+            android:layout_below="@+id/transmit_layout"
+            android:layout_alignParentStart="true"
+            android:textColor="@color/foreground_material_dark"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:enabled="true" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentStart="true"
+        android:id="@+id/receive_layout"
+        android:layout_below="@+id/transmit_layout"
+        android:layout_above="@+id/button_receive_cls">
+
+        <TextView
+            android:text="Receive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/receive_tag" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ems="10"
+            android:id="@+id/receive_output"
+            android:layout_below="@+id/receive_tag"
+            android:layout_alignParentStart="true"
+            android:enabled="true"
+            android:textAlignment="gravity"
+            android:lines="1024"
+            android:typeface="monospace"
+            android:editable="false"
+            android:textIsSelectable="true"
+            android:gravity="top" />
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear"
+        android:id="@+id/button_receive_cls"
+        android:textColor="@color/foreground_material_dark"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:enabled="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="48dp" />
+
+</RelativeLayout>

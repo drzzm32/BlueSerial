@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BlueSerial</string>
+    <string name="action_about">About</string>
+
+    <string name="title_activity_about">About</string>
+    <string name="about_button">Back</string>
+    <string name="about_content">the WDJ\n2005 - 2016</string>
+</resources>
