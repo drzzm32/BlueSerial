@@ -131,18 +131,21 @@ public class MainActivity extends AppCompatActivity {
                 // Do something when successfully connected
                 Snackbar.make(findViewById(R.id.button_connect), "Bluetooth is successfully connected", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                BlueSerial.connected = true;
             }
 
             public void onDeviceDisconnected() {
                 // Do something when connection was disconnected
                 Snackbar.make(findViewById(R.id.button_connect), "Bluetooth connection was disconnected", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                BlueSerial.connected = false;
             }
 
             public void onDeviceConnectionFailed() {
                 // Do something when connection failed
                 Snackbar.make(findViewById(R.id.button_connect), "Bluetooth connection was failed", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                BlueSerial.connected = false;
             }
         });
 
@@ -195,13 +198,22 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         } else if (id == R.id.action_extra) {
-            if (BlueSerial.instance.getServiceState() == BluetoothState.STATE_CONNECTED) {
+            //if (BlueSerial.instance.getServiceState() == BluetoothState.STATE_CONNECTED) {
                 Intent intent = new Intent(getApplicationContext(), ExtraActivity.class);
                 startActivity(intent);
-            } else {
-                Snackbar.make(findViewById(R.id.button_connect), "Bluetooth is not connected", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
+            //} else {
+            //    Snackbar.make(findViewById(R.id.button_connect), "Bluetooth is not connected", Snackbar.LENGTH_LONG)
+            //            .setAction("Action", null).show();
+            //}
+            return true;
+        } else if (id == R.id.action_controller) {
+            //if (BlueSerial.instance.getServiceState() == BluetoothState.STATE_CONNECTED) {
+                Intent intent = new Intent(getApplicationContext(), ControllerActivity.class);
+                startActivity(intent);
+            //} else {
+            //    Snackbar.make(findViewById(R.id.button_connect), "Bluetooth is not connected", Snackbar.LENGTH_LONG)
+            //            .setAction("Action", null).show();
+            //}
             return true;
         }
 

@@ -11,4 +11,10 @@
         android:orderInCategory="1"
         app:showAsAction="always"
         android:icon="@drawable/ic_extra" />
+
+    <item android:id="@+id/action_controller"
+        android:title="Controller"
+        android:orderInCategory="2"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_controller" />
 </menu>
