@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.thewdj.blueserial">
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -32,7 +35,13 @@
             android:label="@string/title_activity_about"
             android:parentActivityName=".MainActivity"
             android:theme="@style/FullscreenTheme" />
-        <activity android:name=".ExtraActivity"></activity>
+        <activity android:name=".ExtraActivity" />
+        <activity
+            android:name=".ble.BLEMainActivity"
+            android:label="@string/app_name_le"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <service android:name=".ble.BluetoothLeService" android:enabled="true"/>
     </application>
 
 </manifest>

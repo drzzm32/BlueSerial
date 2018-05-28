@@ -1,35 +1,39 @@
 package org.thewdj.blueserial;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.thewdj.blueserial.ble.BLEMainActivity;
+import org.thewdj.blueserial.ble.BluetoothLeService;
 import org.thewdj.blueserial.core.BlueSerial;
 
+import java.security.Permission;
 import java.util.Set;
-
-import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 public class ConnectActivity extends AppCompatActivity {
 
     private BluetoothAdapter mBtAdapter;
+    private BluetoothLeScanner mLeScanner;
     private ArrayAdapter<String> mPairedDevicesArrayAdapter;
     private Set<BluetoothDevice> pairedDevices;
     private FloatingActionButton scanButton;
@@ -48,6 +52,12 @@ public class ConnectActivity extends AppCompatActivity {
         scanButton = (FloatingActionButton) findViewById(R.id.button_scan);
         scanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
+                        checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+                    requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, 0);
+                }
+
                 Snackbar.make(view, "Searching for device", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 doDiscovery();
@@ -73,6 +83,7 @@ public class ConnectActivity extends AppCompatActivity {
 
         // Get the local Bluetooth adapter
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        mLeScanner = mBtAdapter.getBluetoothLeScanner();
 
         // Get a set of currently paired devices
         pairedDevices = mBtAdapter.getBondedDevices();
@@ -93,6 +104,7 @@ public class ConnectActivity extends AppCompatActivity {
         // Make sure we're not doing discovery anymore
         if (mBtAdapter != null) {
             mBtAdapter.cancelDiscovery();
+            mLeScanner.stopScan(mLeScanCallback);
         }
 
         // Unregister broadcast listeners
@@ -122,27 +134,84 @@ public class ConnectActivity extends AppCompatActivity {
         // If we're already discovering, stop it
         if (mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
+            mLeScanner.stopScan(mLeScanCallback);
         }
 
         // Request discover from BluetoothAdapter
         mBtAdapter.startDiscovery();
+        mLeScanner.startScan(mLeScanCallback);
     }
 
     // The on-click listener for all devices in the ListViews
     private AdapterView.OnItemClickListener mDeviceClickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> adapterView, View view, int arg2, long arg3) {
             // Cancel discovery because it's costly and we're about to connect
-            if(mBtAdapter.isDiscovering())
+            if(mBtAdapter.isDiscovering()) {
                 mBtAdapter.cancelDiscovery();
+                mLeScanner.stopScan(mLeScanCallback);
+            }
 
             if(!((TextView) view).getText().toString().equals("No devices found")) {
                 // Get the device MAC address, which is the last 17 chars in the View
                 String info = ((TextView) view).getText().toString();
-                String address = info.substring(info.length() - 17);
+                String address = parseAddress(info);
+                String name = info.replace(address, "").replace("\n", "");
 
                 // Connect the device
-                BlueSerial.instance.connect(address);
+                if (info.contains(BluetoothLeService.BLE)) {
+                    BLEMainActivity.doConnect(ConnectActivity.this, name, address);
+                } else {
+                    BlueSerial.instance.connect(address);
+                }
                 finish();
+            }
+        }
+    };
+
+    private String parseAddress(String info) {
+        return info.substring(info.length() - 17);
+    }
+
+    private boolean verifyByInfo(String info) {
+        String item;
+        for (int i = 0; i < mPairedDevicesArrayAdapter.getCount(); i++) {
+            item = mPairedDevicesArrayAdapter.getItem(i);
+            if (item != null) {
+                if (item.equals(info)) return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean verifyByAddress(String addr) {
+        String item;
+        for (int i = 0; i < mPairedDevicesArrayAdapter.getCount(); i++) {
+            item = mPairedDevicesArrayAdapter.getItem(i);
+            if (item != null) {
+                if (parseAddress(item).equals(addr))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private final ScanCallback mLeScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            super.onScanResult(callbackType, result);
+
+            if (callbackType == ScanSettings.CALLBACK_TYPE_ALL_MATCHES) {
+                BluetoothDevice device = result.getDevice();
+                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                    if(mPairedDevicesArrayAdapter.getItem(0).equals("No devices found")) {
+                        mPairedDevicesArrayAdapter.remove("No devices found");
+                    }
+                    String dev = device.getName() + BluetoothLeService.BLE + "\n" + device.getAddress();
+                    if (!verifyByInfo(dev))
+                        mPairedDevicesArrayAdapter.add(dev);
+                    if (verifyByInfo(dev.replace(BluetoothLeService.BLE, "")))
+                        mPairedDevicesArrayAdapter.remove(dev.replace(BluetoothLeService.BLE, ""));
+                }
             }
         }
     };
@@ -163,7 +232,9 @@ public class ConnectActivity extends AppCompatActivity {
                     if(mPairedDevicesArrayAdapter.getItem(0).equals("No devices found")) {
                         mPairedDevicesArrayAdapter.remove("No devices found");
                     }
-                    mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+                    String dev = device.getName() + "\n" + device.getAddress();
+                    if (!verifyByInfo(dev) && !verifyByAddress(device.getAddress()))
+                        mPairedDevicesArrayAdapter.add(dev);
                 }
 
                 // When discovery is finished, change the Activity title
