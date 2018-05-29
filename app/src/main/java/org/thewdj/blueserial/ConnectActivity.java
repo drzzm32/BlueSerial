@@ -52,15 +52,14 @@ public class ConnectActivity extends AppCompatActivity {
         scanButton = (FloatingActionButton) findViewById(R.id.button_scan);
         scanButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-
                 if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED ||
                         checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
                     requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, 0);
+                } else {
+                    Snackbar.make(view, "Searching for device", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    doDiscovery();
                 }
-
-                Snackbar.make(view, "Searching for device", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                doDiscovery();
             }
         });
 

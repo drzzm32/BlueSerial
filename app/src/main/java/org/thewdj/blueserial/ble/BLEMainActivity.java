@@ -31,7 +31,6 @@ import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
@@ -44,7 +43,6 @@ import android.widget.EditText;
 import org.thewdj.blueserial.ConnectActivity;
 import org.thewdj.blueserial.R;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,10 +110,12 @@ public class BLEMainActivity extends AppCompatActivity {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
-
+                Snackbar.make(findViewById(R.id.button_connect), "Bluetooth is successfully connected", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
                 mConnected = false;
-
+                Snackbar.make(findViewById(R.id.button_connect), "Bluetooth connection was disconnected", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(mBLEService.getSupportedGattServices());
@@ -141,12 +141,8 @@ public class BLEMainActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
 
         FloatingActionButton buttonConnect = (FloatingActionButton) findViewById(R.id.button_connect);
         buttonConnect.setOnClickListener(new View.OnClickListener() {
