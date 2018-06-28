@@ -157,11 +157,12 @@ public class ConnectActivity extends AppCompatActivity {
                 String name = info.replace(address, "").replace("\n", "");
 
                 // Connect the device
-                if (info.contains(BluetoothLeService.BLE)) {
-                    BLEMainActivity.doConnect(ConnectActivity.this, name, address);
-                } else {
-                    BlueSerial.instance.connect(address);
-                }
+                BLEMainActivity.doConnect(ConnectActivity.this, name, address);
+                //if (info.contains(BluetoothLeService.BLE)) {
+                //    BLEMainActivity.doConnect(ConnectActivity.this, name, address);
+                //} else {
+                //    BlueSerial.instance.connect(address);
+                //}
                 finish();
             }
         }
